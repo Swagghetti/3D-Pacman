@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MazeCell : MonoBehaviour
 {
+    public int xIndex;
+    public int yIndex;
     [SerializeField] GameObject _centerBlock;
     [SerializeField] GameObject _topWall;
     [SerializeField] GameObject _bottomWall;
@@ -15,6 +17,7 @@ public class MazeCell : MonoBehaviour
 
     public void Visit()
     {
+        Debug.Log("Visiting cell at " + xIndex + ", " + yIndex);
         isVisited = true;
         _centerBlock.SetActive(false);
     }
@@ -26,7 +29,7 @@ public class MazeCell : MonoBehaviour
     
     public void ClearRightWall()
     {
-        _leftWall.SetActive(false);
+        _rightWall.SetActive(false);
     }
 
     public void ClearTopWall()

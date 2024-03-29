@@ -8,8 +8,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] NavMeshAgent agent;
     private GameObject _player;
 
-    private float _refreshDuration = 3.3f;
-    private float _refreshTimer = 0.0f;
+    
 
     void Start()
     {
@@ -18,15 +17,8 @@ public class EnemyController : MonoBehaviour
         agent.SetDestination(_player.transform.position);
     }
 
-
-    private void FixedUpdate()
+    public void SetTarget(Transform target)
     {
-        _refreshTimer += Time.deltaTime;
-        if (_refreshTimer > _refreshDuration)
-        {
-            Debug.Log("refreshing path");
-            agent.SetDestination(_player.transform.position);
-            _refreshTimer = 0.0f;
-        }
+        agent.SetDestination(target.position);
     }
 }

@@ -21,27 +21,32 @@ public class Link : MonoBehaviour
 
     public void OnNodeTrigger(GameObject ball)
     {
-        GetDestination(ball);
+        if (ball.GetComponent<EnemyController>().isOnLink)
+        {
+            GetDestination(ball);
+        }
     }
 
     private void GetDestination(GameObject ball)
     {
-        Debug.Log("Distance " + Vector3.Distance(ball.transform.position, _firstEnd.position));
-        Debug.Log("Distance " + Vector3.Distance(ball.transform.position, _secondEnd.position));
-
-        if (Vector3.Distance(ball.transform.position, _firstEnd.position) < 3f)
+        if (Vector3.Distance(ball.transform.position, _firstEnd.position) < 0.8f)
         {
+            Debug.Log("Second end: " + _secondEnd.transform.position.x + " " + _secondEnd.transform.position.z);
             TeleportToLocation(ball, _secondEnd);
         }
-        else if (Vector3.Distance(ball.transform.position, _secondEnd.position) < 3f)
+        else if (Vector3.Distance(ball.transform.position, _secondEnd.position) < 0.8f)
         {
+            Debug.Log("First end: " + _firstEnd.transform.position.x + " " + _firstEnd.transform.position.z);
             TeleportToLocation(ball, _firstEnd);
         }
+
+        
     }
 
     private void TeleportToLocation(GameObject enemy, Transform destination)
     {
         Debug.Log("TeleportToLocation " + destination.position.x + ", " + destination.position.x);
-        enemy.transform.position = destination.position;
+        enemy.GetComponent<EnemyController>().agent.Warp(destination.position);
+        enemy.GetComponent<EnemyController>().SetTargetAsPlayer();
     }
 }

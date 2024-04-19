@@ -17,7 +17,6 @@ public class MazeCell : MonoBehaviour
 
     public void Visit()
     {
-        Debug.Log("Visiting cell at " + xIndex + ", " + yIndex);
         isVisited = true;
         _centerBlock.SetActive(false);
     }

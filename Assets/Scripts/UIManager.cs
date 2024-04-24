@@ -1,27 +1,47 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour, ILoseObserver, IGoldObserver
 {
     List<IGoldSubject> _goldSubjects;
     List<ILoseSubject> _loseSubjects;
+    [SerializeField] private TextMeshProUGUI _timerText;
+    [SerializeField] private TextMeshProUGUI _goldText;
+
+    void Start()
+    {
+        _goldSubjects = new List<IGoldSubject>();
+        _loseSubjects = new List<ILoseSubject>();
+
+        _goldText.text = "0";
+    }
+
+    public void SetGoldText()
+    {
+        _goldText.text = Convert.ToInt32(_goldText.text) + 1 + "";
+    }
+
+    public void SetTimer(float time)
+    {
+        _timerText.text = time.ToString("F2");
+    }
 
     public void AddGoldSubject(IGoldSubject subject)
     {
-        subject.AddObserver(this);
         _goldSubjects.Add(subject);
     }
 
     public void AddLoseSubject(ILoseSubject subject)
     {
-        subject.AddObserver(this);
         _loseSubjects.Add(subject);
     }
 
     public void OnNotifyGold()
     {
-        Debug.Log("Gold has been updated");
+        SetGoldText();
     }
 
     public void OnNotifyLose()
@@ -41,16 +61,4 @@ public class UIManager : MonoBehaviour, ILoseObserver, IGoldObserver
         _goldSubjects.Remove(subject);
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        _goldSubjects = new List<IGoldSubject>();
-        _loseSubjects = new List<ILoseSubject>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

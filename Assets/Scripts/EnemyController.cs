@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, ILoseSubject
 {
     [SerializeField] public NavMeshAgent agent;
-    private GameObject _player;
     [SerializeField] public bool isOnLink;
+    private UIManager _uiManager;
+    private GameObject _player;
+    private List<ILoseObserver> _observers = new List<ILoseObserver>();
 
     void Update()
     {
@@ -16,10 +18,12 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
+        _uiManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         _player = GameObject.FindGameObjectWithTag("Player");
 
         agent.SetDestination(_player.transform.position);
 
+        AddObserver(_uiManager);
     }
 
     public void SetTarget(Transform target)
@@ -30,5 +34,34 @@ public class EnemyController : MonoBehaviour
     public void SetTargetAsPlayer()
     {
         agent.SetDestination(_player.transform.position);
+    }
+
+
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("Player has been caught");
+            NotifyObservers();
+        }
+    }
+
+    public void AddObserver(ILoseObserver observer)
+    {
+        _observers.Add(observer);
+    }
+
+    public void RemoveObserver(ILoseObserver observer)
+    {
+        _observers.Remove(observer);
+    }
+
+    public void NotifyObservers()
+    {
+        foreach (var observer in _observers)
+        {
+            observer.OnNotifyLose();
+        }
     }
 }

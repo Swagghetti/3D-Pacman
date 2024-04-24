@@ -5,8 +5,10 @@ using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float _speed = 2.0f;
     [SerializeField] private Rigidbody _rb;
+    [SerializeField] public NavMeshAgent agent;
+    public bool isOnLink;
+    [SerializeField] private GameObject _link;
 
     void Start()
     {
@@ -16,25 +18,38 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetMouseButtonDown(0))
         {
-            _rb.velocity = new Vector3(-_speed, 0, 0);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                agent.SetDestination(hit.point);
+            }
         }
-        else if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKeyDown(KeyCode.Space) && isOnLink)
         {
-            _rb.velocity = new Vector3(_speed, 0, 0);
+            _link.GetComponent<Link>().GetDestination(gameObject);
         }
-        else if (Input.GetKey(KeyCode.W))
+        
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Link"))
         {
-            _rb.velocity = new Vector3(0, 0, _speed);
+            isOnLink = true;
+            _link = other.gameObject.transform.parent.gameObject;
         }
-        else if (Input.GetKey(KeyCode.S))
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Link"))
         {
-            _rb.velocity = new Vector3(0, 0, -_speed);
-        }
-        else
-        {
-            _rb.velocity = Vector3.zero;
+            isOnLink = false;
+            _link = null;
         }
     }
 }

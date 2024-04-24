@@ -7,6 +7,7 @@ public class EnemyController : MonoBehaviour, ILoseSubject
 {
     [SerializeField] public NavMeshAgent agent;
     [SerializeField] public bool isOnLink;
+    private GameManager _gameManager;
     private UIManager _uiManager;
     private GameObject _player;
     private List<ILoseObserver> _observers = new List<ILoseObserver>();
@@ -18,12 +19,14 @@ public class EnemyController : MonoBehaviour, ILoseSubject
 
     void Start()
     {
+        _gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         _uiManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         _player = GameObject.FindGameObjectWithTag("Player");
 
         agent.SetDestination(_player.transform.position);
 
         AddObserver(_uiManager);
+        AddObserver(_gameManager);
     }
 
     public void SetTarget(Transform target)
@@ -42,7 +45,6 @@ public class EnemyController : MonoBehaviour, ILoseSubject
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Player has been caught");
             NotifyObservers();
         }
     }

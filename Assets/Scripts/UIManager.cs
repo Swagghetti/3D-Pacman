@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour, ILoseObserver, IGoldObserver
 {
@@ -10,6 +11,8 @@ public class UIManager : MonoBehaviour, ILoseObserver, IGoldObserver
     List<ILoseSubject> _loseSubjects;
     [SerializeField] private TextMeshProUGUI _timerText;
     [SerializeField] private TextMeshProUGUI _goldText;
+    [SerializeField] private TextMeshProUGUI _highScoreText;
+    [SerializeField] private GameObject _panel; 
 
     void Start()
     {
@@ -17,11 +20,18 @@ public class UIManager : MonoBehaviour, ILoseObserver, IGoldObserver
         _loseSubjects = new List<ILoseSubject>();
 
         _goldText.text = "0";
+
+        SetHighScoreText();
     }
 
     public void SetGoldText()
     {
         _goldText.text = Convert.ToInt32(_goldText.text) + 1 + "";
+    }
+
+    public void SetHighScoreText()
+    {
+        _highScoreText.text = PlayerPrefs.GetInt("HighScore").ToString();
     }
 
     public void SetTimer(float time)
@@ -47,6 +57,7 @@ public class UIManager : MonoBehaviour, ILoseObserver, IGoldObserver
     public void OnNotifyLose()
     {
         Debug.LogWarning("Player has been caught");
+        _panel.SetActive(true);
     }
 
     public void RemoveLoseSubject(ILoseSubject subject)

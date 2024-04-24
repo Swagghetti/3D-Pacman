@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using DG.Tweening;
+using System;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour, IGoldObserver, ILoseObserver
 {
@@ -15,6 +17,8 @@ public class GameManager : MonoBehaviour, IGoldObserver, ILoseObserver
     private List<ILoseSubject> _loseSubjects;
 
     [SerializeField] private GameObject _ghostPrefab;
+    [SerializeField] private GameObject _goldPrefab;
+
     [SerializeField] private TextMeshProUGUI _countDownText;
     [SerializeField] private UIManager _uiManager;
 
@@ -25,12 +29,15 @@ public class GameManager : MonoBehaviour, IGoldObserver, ILoseObserver
 
     void Start()
     {
+        Time.timeScale = 1.0f;
         _goldSubjects = new List<IGoldSubject>();
         _loseSubjects = new List<ILoseSubject>();
         _enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
         _player = GameObject.FindGameObjectWithTag("Player");
 
         CreateGhost();
+
+        GenerateGoldRandomly();
     }
 
     // Update is called once per frame
@@ -62,6 +69,18 @@ public class GameManager : MonoBehaviour, IGoldObserver, ILoseObserver
     public void OnNotifyGold()
     {
         _gold++;
+
+        GenerateGoldRandomly();
+    }
+
+    private void GenerateGoldRandomly()
+    {
+        int randomX = UnityEngine.Random.Range(-4, 5);
+        int randomZ = UnityEngine.Random.Range(-4, 5);
+
+        Vector3 randomPosition = new Vector3(randomX * 5 - 2.5f, 0f, randomZ * 5 - 2.5f);
+
+        Instantiate(_goldPrefab, randomPosition, Quaternion.identity);
     }
 
     public void AddGoldSubject(IGoldSubject subject)
@@ -79,7 +98,12 @@ public class GameManager : MonoBehaviour, IGoldObserver, ILoseObserver
 
     public void OnNotifyLose()
     {
-        throw new System.NotImplementedException();
+        if (_gold > PlayerPrefs.GetInt("HighScore", 0))
+        {
+            PlayerPrefs.SetInt("HighScore", _gold);
+        }
+
+        Time.timeScale = 0.0f;
     }
 
     public void AddLoseSubject(ILoseSubject subject)
@@ -90,5 +114,12 @@ public class GameManager : MonoBehaviour, IGoldObserver, ILoseObserver
     public void RemoveLoseSubject(ILoseSubject subject)
     {
         _loseSubjects.Remove(subject);
+    }
+
+
+    public void ReloadScene()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
     }
 }
